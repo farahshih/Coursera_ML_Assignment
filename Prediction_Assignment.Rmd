@@ -1,0 +1,62 @@
+---
+title: "Prediction_Assignment"
+output: html_document
+---
+### Load required packages
+```{r, message=FALSE}
+library(caret)
+library(randomForest)
+library(doParallel)
+```
+
+### Read and Clean Data
+Read file and mark "#DIV/0!" as NA.
+```{r read data, cache=TRUE}
+wle<-read.csv("~/Documents/Codes/Coursera_DS/08-Practical_ML/pml-training.csv",na.strings=c("#DIV/0!"))
+```
+
+Transform all variable columns into numeric.
+```{r warning=FALSE}
+for (i in c(8:ncol(wle)-1)){
+  wle[,i] <- as.numeric(as.character(wle[,i]))
+}
+```
+
+Check the distribution of missing values(NAs) and delete variables that have too many missing values.
+```{r, cache=TRUE}
+NAtable<-apply(wle, 2, function(x){sum(is.na(x))})
+# These are column which have no missing values. Using these predictors to build model
+features<-names(NAtable[NAtable==0])
+features<-features[8:length(features)]
+
+# This is the dataset we will use to build model
+cl_wle<-wle[,features]
+```
+
+### Divide dataset into training data and test data
+```{r}
+slice <- createDataPartition(y=cl_wle$classe, p=0.7, list=FALSE )
+train <- cl_wle[slice,]
+test <- cl_wle[-slice,]
+```
+
+### Build model on training data
+We build 5 random forests with 150 trees each. Here we also use parallel processing to speed up the model building process.
+
+```{r, cache=TRUE}
+registerDoParallel()
+x <- train[-ncol(train)]
+y <- train$classe
+rf <- foreach(ntree=rep(150, 6), .combine=randomForest::combine, .packages='randomForest') %dopar% {randomForest(x, y, ntree=ntree)}
+```
+
+### Evaluate Model
+From our confusionMatrix, the model seems to be very good. The prediction on test data is 99%.
+```{r}
+predict1 <- predict(rf, newdata=train)
+confusionMatrix(predict1,train$classe)
+
+predict2 <- predict(rf, newdata=test)
+confusionMatrix(predict2,test$classe)
+```
+
