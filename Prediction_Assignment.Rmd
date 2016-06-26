@@ -60,3 +60,22 @@ predict2 <- predict(rf, newdata=test)
 confusionMatrix(predict2,test$classe)
 ```
 
+### Quiz (apply model on Test Dataset)
+read test data
+```{r}
+wle_test<-read.csv("~/Documents/Codes/Coursera_DS/08-Practical_ML/pml-testing.csv",na.strings=c("#DIV/0!"))
+```
+
+Transform all variable columns into numeric.
+```{r warning=FALSE}
+for (i in c(8:ncol(wle_test)-1)){
+  wle_test[,i] <- as.numeric(as.character(wle_test[,i]))
+}
+```
+
+Use the model built to predict test dataset
+```{r}
+cl_wle_test<-wle_test[,features[1:52]]
+predict3 <- predict(rf, newdata=cl_wle_test)
+predict3
+```

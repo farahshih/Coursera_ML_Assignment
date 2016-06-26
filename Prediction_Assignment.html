@@ -226,6 +226,22 @@ confusionMatrix(predict2,test$classe)</code></pre>
 ## Detection Prevalence   0.2845   0.1954   0.1752   0.1613   0.1837
 ## Balanced Accuracy      0.9996   0.9983   0.9930   0.9910   0.9990</code></pre>
 </div>
+<div id="quiz-apply-model-on-test-dataset" class="section level3">
+<h3>Quiz (apply model on Test Dataset)</h3>
+<p>read test data</p>
+<pre class="r"><code>wle_test&lt;-read.csv(&quot;~/Documents/Codes/Coursera_DS/08-Practical_ML/pml-testing.csv&quot;,na.strings=c(&quot;#DIV/0!&quot;))</code></pre>
+<p>Transform all variable columns into numeric.</p>
+<pre class="r"><code>for (i in c(8:ncol(wle_test)-1)){
+  wle_test[,i] &lt;- as.numeric(as.character(wle_test[,i]))
+}</code></pre>
+<p>Use the model built to predict test dataset</p>
+<pre class="r"><code>cl_wle_test&lt;-wle_test[,features[1:52]]
+predict3 &lt;- predict(rf, newdata=cl_wle_test)
+predict3</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
+</div>
 
 
 
